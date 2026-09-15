@@ -5,7 +5,7 @@
       <div class="card-header">
         <div class="player muted">{{ playerName || '昵称#数字ID' }}</div>
         <div class="title">{{ primary }}</div>
-        <div class="pro-line muted">职业哥定位：——</div>
+        <div class="pro-line muted">职业哥定位：{{ proStyle }}</div>
       </div>
       <div class="card-radar">
         <RadarChart :scores="scores" :height="200" />
@@ -25,6 +25,7 @@
 import { ref, computed } from 'vue'
 import html2canvas from 'html2canvas'
 import RadarChart from './RadarChart.vue'
+import { proStyleFor } from '../pros'
 
 const props = defineProps({
   primary: { type: String, default: '' },
@@ -37,13 +38,19 @@ const props = defineProps({
 const cardEl = ref(null)
 
 const grade = computed(() => props.scores?.grade || '—')
+const proStyle = computed(() => proStyleFor(props.primary))
 
 async function saveImage() {
-  const canvas = await html2canvas(cardEl.value, { backgroundColor: '#0f1923' })
-  const link = document.createElement('a')
-  link.download = `valorant-coach-${props.playerName || 'card'}.png`
-  link.href = canvas.toDataURL('image/png')
-  link.click()
+  try {
+    const canvas = await html2canvas(cardEl.value, { backgroundColor: '#0f1923' })
+    const link = document.createElement('a')
+    link.download = `valorant-coach-${props.playerName || 'card'}.png`
+    link.href = canvas.toDataURL('image/png')
+    link.click()
+  } catch (err) {
+    console.error('保存分享图失败:', err)
+    alert('保存图片失败，请稍后重试')
+  }
 }
 </script>
 
