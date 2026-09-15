@@ -12,6 +12,11 @@ export async function getAnalysis(matchId, name) {
   if (!r.ok) throw new Error((await r.json()).detail || '分析失败')
   return r.json()
 }
+export async function getWeekly(name) {
+  const r = await fetch(`${BASE}/analysis/weekly?name=${encodeURIComponent(name)}`)
+  if (!r.ok) throw new Error((await r.json()).detail || '获取周度分析失败')
+  return r.json()
+}
 export async function getPlan(name) {
   const r = await fetch(`${BASE}/plan?name=${encodeURIComponent(name)}`)
   if (!r.ok) throw new Error((await r.json()).detail || '获取训练计划失败')
