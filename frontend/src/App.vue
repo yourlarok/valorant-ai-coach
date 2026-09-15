@@ -34,7 +34,9 @@
           />
         </div>
         <div class="topbar__status">
-          <UiTag tone="firstblood" dot>LLM · Mock 通道</UiTag>
+          <UiTag :tone="llmConfigured ? 'win' : 'firstblood'" dot>
+            {{ llmConfigured ? 'LLM 已连接' : 'Mock 演示通道' }}
+          </UiTag>
         </div>
       </header>
       <main class="content">
@@ -47,7 +49,9 @@
 </template>
 
 <script setup>
+import { ref, onMounted } from 'vue'
 import { playerName, setPlayerName } from './player'
+import { getSettings } from './api'
 import { UiTag, UiToast } from './components/ui'
 
 const navItems = [
@@ -56,6 +60,17 @@ const navItems = [
   { to: '/plan', label: '训练中心' },
   { to: '/settings', label: '设置' },
 ]
+
+const llmConfigured = ref(false)
+
+onMounted(async () => {
+  try {
+    const data = await getSettings()
+    llmConfigured.value = !!data?.configured
+  } catch {
+    llmConfigured.value = false
+  }
+})
 
 function saveName() {
   setPlayerName(playerName.value)

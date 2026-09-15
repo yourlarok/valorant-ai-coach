@@ -22,6 +22,19 @@ export async function getPlan(name) {
   if (!r.ok) throw new Error((await r.json()).detail || '获取训练计划失败')
   return r.json()
 }
+export async function getSettings() {
+  const r = await fetch(`${BASE}/settings/llm`)
+  if (!r.ok) throw new Error((await r.json()).detail || '获取 LLM 配置失败')
+  return r.json()
+}
+export async function saveSettings(body) {
+  const r = await fetch(`${BASE}/settings/llm`, {
+    method: 'PUT', headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(body),
+  })
+  if (!r.ok) throw new Error((await r.json()).detail || '保存 LLM 配置失败')
+  return r.json()
+}
 export async function toggleTask(name, taskName, done) {
   const r = await fetch(`${BASE}/plan/toggle?name=${encodeURIComponent(name)}`, {
     method: 'POST', headers: { 'Content-Type': 'application/json' },

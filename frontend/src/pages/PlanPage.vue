@@ -1,79 +1,90 @@
 <template>
-  <div>
-    <p v-if="!playerName" class="panel muted">请先在右上角填入你的玩家名（昵称#数字ID）。</p>
-    <p v-else-if="loading" class="panel muted">加载中，正在生成训练计划…</p>
+  <div class="plan">
+    <UiCard v-if="!playerName" cut>
+      <UiEmpty
+        title="先填入你的玩家名"
+        description="在右上角填入玩家名（格式：昵称#数字ID）即可生成本周训练计划。"
+      />
+    </UiCard>
 
-    <div v-else-if="error" class="panel">
-      <p class="accent">{{ error }}</p>
-      <button @click="loadPlan">重试</button>
-    </div>
+    <template v-else-if="loading">
+      <UiCard><UiSkeleton :lines="4" height="20px" /></UiCard>
+      <UiCard><UiSkeleton :lines="3" /></UiCard>
+      <UiCard><UiSkeleton :lines="2" height="28px" /></UiCard>
+    </template>
+
+    <UiCard v-else-if="error">
+      <UiEmpty title="无法生成训练计划" :description="error">
+        <UiButton variant="ghost" @click="loadPlan">重试</UiButton>
+      </UiEmpty>
+    </UiCard>
 
     <template v-else>
-      <div class="panel">
-        <h2>训练计划</h2>
-        <p v-if="toggleError" class="accent toggle-error">{{ toggleError }}</p>
-        <div class="task-list">
+      <!-- 本周计划 -->
+      <UiCard title="本周计划" cut>
+        <p v-if="toggleError" class="plan__error">{{ toggleError }}</p>
+        <UiEmpty
+          v-if="!tasks.length"
+          title="暂无训练任务"
+          description="后端尚未为该玩家生成训练任务，请稍后重试。"
+        />
+        <div v-else class="tasks">
           <label
             v-for="t in tasks"
             :key="t.name"
-            class="task-card"
-            :class="{ done: t.done }"
+            class="task"
+            :class="{ 'task--done': t.done }"
           >
             <input
               type="checkbox"
               :checked="t.done"
               @change="onToggle(t, $event.target.checked)"
             />
-            <div class="task-body">
-              <div class="task-head">
-                <span class="task-name">{{ t.name }}</span>
-                <span class="tool-tag" :style="tagStyle(t.tool)">{{ t.tool }}</span>
-                <span class="freq muted">{{ t.freq }}</span>
+            <div class="task__body">
+              <div class="task__head">
+                <span class="task__name">{{ t.name }}</span>
+                <UiTag :tone="tagTone(t.tool)">{{ t.tool }}</UiTag>
+                <span class="task__freq muted num">{{ t.freq }}</span>
               </div>
-              <p class="detail muted">{{ t.detail }}</p>
+              <p class="task__detail muted">{{ t.detail }}</p>
             </div>
           </label>
         </div>
-      </div>
+      </UiCard>
 
-      <div class="panel retest">
-        <div class="retest-head">
-          <h3>复测</h3>
-          <button :disabled="retestLoading" @click="retest">
+      <!-- 复测对比 -->
+      <UiCard title="复测对比">
+        <template #actions>
+          <UiButton size="sm" variant="ghost" :disabled="retestLoading" @click="retest">
             {{ retestLoading ? '复测中…' : '重新拉取最近对局复测' }}
-          </button>
-        </div>
-        <p v-if="retestError" class="accent">{{ retestError }}</p>
+          </UiButton>
+        </template>
+        <p v-if="retestError" class="plan__error">{{ retestError }}</p>
 
-        <template v-if="currentScores">
-          <p class="muted">
+        <UiEmpty
+          v-if="!currentScores"
+          title="尚未复测"
+          description="点击右上角按钮，拉取最近一场对局重新评分，与上次快照对比。"
+        />
+        <template v-else>
+          <p class="plan__compare-note muted">
             {{ prevSnapshot ? `与上次快照（${prevSnapshot.date}）对比` : '首次复测，已记录为基线快照' }}
           </p>
-          <table class="compare">
-            <thead>
-              <tr>
-                <th>维度</th>
-                <th>本次</th>
-                <th>上次</th>
-                <th>变化</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr v-for="row in compareRows" :key="row.key">
-                <td>{{ row.label }}</td>
-                <td>{{ row.current }}</td>
-                <td>{{ row.prev ?? '—' }}</td>
-                <td :class="deltaClass(row.delta)">{{ deltaText(row.delta) }}</td>
-              </tr>
-            </tbody>
-          </table>
+          <UiTable :columns="compareColumns" :rows="compareRows" row-key="key">
+            <template #cell-prev="{ row }">
+              <span class="num">{{ row.prev ?? '—' }}</span>
+            </template>
+            <template #cell-delta="{ row }">
+              <span class="num" :class="deltaClass(row.delta)">{{ deltaText(row.delta) }}</span>
+            </template>
+          </UiTable>
         </template>
-      </div>
+      </UiCard>
 
-      <div class="panel">
-        <h3>评分趋势</h3>
+      <!-- 历史趋势 -->
+      <UiCard title="历史趋势">
         <ScoreTrend :history="history" />
-      </div>
+      </UiCard>
     </template>
   </div>
 </template>
@@ -83,6 +94,7 @@ import { ref, computed, onMounted, watch } from 'vue'
 import { getPlan, toggleTask, listMatches, getAnalysis } from '../api'
 import { playerName } from '../player'
 import ScoreTrend from '../components/ScoreTrend.vue'
+import { UiButton, UiCard, UiEmpty, UiSkeleton, UiTable, UiTag } from '../components/ui'
 
 const HISTORY_KEY = 'val_score_history'
 
@@ -96,7 +108,14 @@ const DIMS = [
   ['overall', '综合'],
 ]
 
-const TAG_COLORS = ['#ff4655', '#4ade80', '#38bdf8', '#fbbf24', '#c084fc', '#f472b6']
+const TAG_TONES = ['accent', 'win', 'info', 'firstblood', 'warn', 'loss']
+
+const compareColumns = [
+  { key: 'label', label: '维度' },
+  { key: 'current', label: '本次', numeric: true },
+  { key: 'prev', label: '上次', numeric: true },
+  { key: 'delta', label: '变化', numeric: true },
+]
 
 const loading = ref(false)
 const error = ref('')
@@ -118,11 +137,10 @@ function loadHistory() {
   }
 }
 
-function tagStyle(tool) {
+function tagTone(tool) {
   let hash = 0
   for (const ch of String(tool || '')) hash = (hash * 31 + ch.charCodeAt(0)) >>> 0
-  const color = TAG_COLORS[hash % TAG_COLORS.length]
-  return { color, borderColor: color, backgroundColor: `${color}1f` }
+  return TAG_TONES[hash % TAG_TONES.length]
 }
 
 const compareRows = computed(() => {
@@ -150,7 +168,7 @@ function deltaText(delta) {
 
 function deltaClass(delta) {
   if (delta == null || delta === 0) return 'muted'
-  return delta > 0 ? 'up' : 'down'
+  return delta > 0 ? 'plan__delta--up' : 'plan__delta--down'
 }
 
 async function loadPlan() {
@@ -237,40 +255,55 @@ watch(playerName, (name, prev) => {
 </script>
 
 <style scoped>
-h2, h3 { margin-top: 0; }
-.task-list { display: flex; flex-direction: column; gap: 12px; }
-.task-card {
-  display: flex; gap: 12px; align-items: flex-start;
-  background: #111c26; border-radius: 6px; padding: 14px;
-  cursor: pointer; border: 1px solid transparent;
+.plan {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-4);
 }
-.task-card.done { border-color: #2b3a47; opacity: 0.75; }
-.task-card input { margin-top: 4px; accent-color: var(--accent); }
-.task-body { flex: 1; }
-.task-head { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
-.task-name { font-weight: 700; }
-.task-card.done .task-name { text-decoration: line-through; color: var(--muted); }
-.tool-tag {
-  font-size: 12px; border: 1px solid; border-radius: 4px;
-  padding: 1px 8px; white-space: nowrap;
+.plan__error {
+  margin: 0 0 var(--sp-3);
+  font-size: var(--fs-body);
+  color: var(--c-loss);
 }
-.freq { font-size: 13px; }
-.detail { margin: 6px 0 0; font-size: 14px; }
-.toggle-error { font-size: 14px; }
-.retest { margin-top: 20px; }
-.retest-head {
-  display: flex; justify-content: space-between;
-  align-items: center; gap: 12px; flex-wrap: wrap;
+
+/* 本周计划任务卡 */
+.tasks {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-2);
 }
-.retest-head h3 { margin: 0; }
-.retest button:disabled { opacity: 0.6; cursor: default; }
-.compare { width: 100%; border-collapse: collapse; font-size: 14px; margin-top: 8px; }
-.compare th {
-  text-align: left; color: var(--muted); font-weight: 500;
-  padding: 6px 8px; border-bottom: 1px solid #2b3a47;
+.task {
+  display: flex;
+  gap: var(--sp-3);
+  align-items: flex-start;
+  background: var(--c-surface-1);
+  border: 1px solid var(--c-border);
+  border-radius: var(--r-md);
+  padding: var(--sp-3);
+  cursor: pointer;
+  transition: border-color var(--dur-fast) var(--ease-out),
+    opacity var(--dur-fast) var(--ease-out);
 }
-.compare td { padding: 7px 8px; border-bottom: 1px solid #111c26; }
-.up { color: #4ade80; font-weight: 700; }
-.down { color: var(--accent); font-weight: 700; }
-.panel:last-child { margin-top: 20px; }
+.task:hover { border-color: var(--c-border-strong); }
+.task--done { opacity: 0.7; }
+.task input { margin-top: 4px; accent-color: var(--c-accent); }
+.task__body { flex: 1; }
+.task__head {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-2);
+  flex-wrap: wrap;
+}
+.task__name { font-weight: 700; }
+.task--done .task__name {
+  text-decoration: line-through;
+  color: var(--c-text-muted);
+}
+.task__freq { font-size: var(--fs-caption); }
+.task__detail { margin: var(--sp-2) 0 0; font-size: var(--fs-body); }
+
+/* 复测对比 */
+.plan__compare-note { margin: 0 0 var(--sp-2); }
+.plan__delta--up { color: var(--c-win); font-weight: 700; }
+.plan__delta--down { color: var(--c-loss); font-weight: 700; }
 </style>

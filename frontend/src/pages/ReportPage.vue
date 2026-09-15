@@ -48,6 +48,15 @@
         <template #default="{ active }">
           <!-- Tab 1 战况总览 -->
           <div v-if="active === 'overview'" class="tab-stack">
+            <UiCard v-if="extBand.length" title="关键指标">
+              <div class="extband">
+                <div v-for="s in extBand" :key="s.label" class="extband__item">
+                  <span class="extband__value num">{{ s.value }}</span>
+                  <span class="extband__label muted">{{ s.label }}</span>
+                </div>
+              </div>
+            </UiCard>
+
             <UiCard title="比分演进">
               <template v-if="progression.length">
                 <div class="evo">
@@ -208,6 +217,20 @@ const problems = computed(() => report.value?.problems || [])
 const prescription = computed(() => deep.value.prescription || [])
 const moments = computed(() => deep.value.moments || [])
 const grade = computed(() => report.value?.scores?.grade || '—')
+
+// 目标玩家扩展指标带：ADR 直接取后端 ext，不做前端重算
+const extBand = computed(() => {
+  const ext = report.value?.ext
+  if (!ext) return []
+  const pct = (v) => (v == null ? '—' : `${Math.round(v * 100)}%`)
+  return [
+    { label: 'ADR', value: ext.adr != null ? Math.round(ext.adr) : '—' },
+    { label: 'KAST', value: pct(ext.kast) },
+    { label: '首杀参与率', value: pct(ext.fb_participation) },
+    { label: '手枪局胜率', value: pct(ext.pistol_wr) },
+    { label: '残局胜率', value: pct(ext.clutch_wr) },
+  ]
+})
 
 const overviewParas = computed(() =>
   (deep.value.overview || '').split(/\n+/).map((s) => s.trim()).filter(Boolean)
@@ -388,6 +411,29 @@ watch(
   flex-direction: column;
   gap: var(--sp-4);
 }
+
+/* 关键指标带 */
+.extband {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  gap: var(--sp-3);
+}
+.extband__item {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-1);
+  background: var(--c-surface-1);
+  border: 1px solid var(--c-border);
+  border-radius: var(--r-sm);
+  padding: var(--sp-2) var(--sp-3);
+}
+.extband__value {
+  font-size: var(--fs-h2);
+  font-weight: 800;
+  line-height: 1.1;
+  color: var(--c-text);
+}
+.extband__label { font-size: var(--fs-caption); letter-spacing: 0.06em; }
 
 /* 比分演进 */
 .evo__bar {
