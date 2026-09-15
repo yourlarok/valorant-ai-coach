@@ -25,9 +25,15 @@ class WeGameSettings(BaseModel):
     base_url: str = "https://mlol.qt.qq.com"
 
 
+class AutomationSettings(BaseModel):
+    enabled: bool = True
+    poll_interval_min: int = 5
+
+
 class Settings(BaseModel):
     llm: LLMSettings = LLMSettings()
     wegame: WeGameSettings = WeGameSettings()
+    automation: AutomationSettings = AutomationSettings()
 
 
 def load_settings() -> Settings:

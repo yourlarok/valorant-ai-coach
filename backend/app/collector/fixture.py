@@ -7,12 +7,16 @@ from app.schemas import Match
 class FixtureCollector:
     def __init__(self, fixture_dir: Path):
         self.fixture_dir = fixture_dir
+        self._extras: list[Match] = []  # dev 模拟新对局的内存暂存，不落盘
+
+    def add_match(self, match: Match) -> None:
+        self._extras.append(match)
 
     def _load_all(self) -> list[Match]:
         matches = []
         for f in sorted(self.fixture_dir.glob("*.json")):
             matches.append(Match.model_validate(json.loads(f.read_text(encoding="utf-8"))))
-        return matches
+        return matches + self._extras
 
     def recent_matches(self, name: str, count: int = 10) -> list[Match]:
         mine = [m for m in self._load_all()

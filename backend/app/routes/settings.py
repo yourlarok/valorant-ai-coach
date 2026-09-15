@@ -2,7 +2,8 @@ from fastapi import APIRouter, Request
 from pydantic import BaseModel
 
 from app.analysis.llm import LLMClient
-from app.config import LLMSettings, load_settings, save_settings
+from app.config import (AutomationSettings, LLMSettings, load_settings,
+                        save_settings)
 
 router = APIRouter(prefix="/api")
 
@@ -38,3 +39,22 @@ def put_llm_settings(request: Request, body: LLMSettingsBody):
     # 热更新，无需重启
     request.app.state.llm = LLMClient(updated.base_url, updated.api_key, updated.model)
     return _public(request.app.state.llm)
+
+
+@router.get("/settings/automation")
+def get_automation_settings():
+    return load_settings().automation
+
+
+@router.put("/settings/automation")
+async def put_automation_settings(request: Request, body: AutomationSettings):
+    settings = load_settings()
+    settings.automation = body
+    save_settings(settings)
+    engine = request.app.state.automation
+    engine.poll_interval_min = body.poll_interval_min
+    if body.enabled:
+        engine.start(request.app)  # fixture 采集器下内部跳过，不真正轮询
+    else:
+        engine.stop()
+    return settings.automation
