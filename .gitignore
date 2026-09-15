@@ -2,6 +2,7 @@ backend/.venv/
 __pycache__/
 *.pyc
 *.db
+backend/config.json
 node_modules/
 frontend/dist/
 .kimi-code/
