@@ -1,0 +1,14 @@
+:root {
+  --bg: #0f1923; --panel: #1a2733; --accent: #ff4655;
+  --text: #ece8e1; --muted: #768079;
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--text);
+  font-family: "PingFang SC", "Microsoft YaHei", sans-serif; }
+.panel { background: var(--panel); border-radius: 8px; padding: 20px; }
+.accent { color: var(--accent); }
+.muted { color: var(--muted); }
+button { background: var(--accent); color: #fff; border: 0; border-radius: 6px;
+  padding: 8px 20px; cursor: pointer; font-size: 14px; }
+input { background: #111c26; border: 1px solid #2b3a47; color: var(--text);
+  border-radius: 6px; padding: 8px 12px; }
