@@ -30,10 +30,16 @@ class AutomationSettings(BaseModel):
     poll_interval_min: int = 5
 
 
+class IdentitySettings(BaseModel):
+    # 绑定的游戏身份（昵称#数字ID）；None = 未完成首次引导
+    name: str | None = None
+
+
 class Settings(BaseModel):
     llm: LLMSettings = LLMSettings()
     wegame: WeGameSettings = WeGameSettings()
     automation: AutomationSettings = AutomationSettings()
+    identity: IdentitySettings = IdentitySettings()
 
 
 def load_settings() -> Settings:
