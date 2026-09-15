@@ -100,7 +100,11 @@ def analyze(request: Request, match_id: str, name: str, rank_tier: str = "钻石
         # LLM 返回非法 JSON、响应缺少 choices 键、HTTP 调用失败或未配置等异常时降级到模板化输出，避免接口 500
         analysis = analyze_match(match, name, raws, primary, subs, None)
     problems = detect_problems(raws, baseline)
-    deep = analyze_deep(match, name, raws, ext, primary, subs, problems, llm)
+    try:
+        deep = analyze_deep(match, name, raws, ext, primary, subs, problems, llm)
+    except Exception:
+        # 深度复盘任何未预期异常都以 llm=None 重试一次，走 Mock/降级路径，避免报告页 500
+        deep = analyze_deep(match, name, raws, ext, primary, subs, problems, None)
     return {
         "scores": scores, "raws": raws,
         "primary": primary, "subs": subs,

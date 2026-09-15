@@ -5,7 +5,7 @@
     <!-- LLM 配置 -->
     <UiCard title="LLM 配置">
       <template #actions>
-        <UiTag v-if="!loading" :tone="configured ? 'win' : 'warn'" dot>
+        <UiTag v-if="!loading && !loadError" :tone="configured ? 'win' : 'warn'" dot>
           {{ configured ? 'LLM 已连接' : '未配置 · Mock 演示通道' }}
         </UiTag>
       </template>
@@ -79,7 +79,8 @@
 
 <script setup>
 import { ref, onMounted } from 'vue'
-import { getSettings, saveSettings } from '../api'
+import { saveSettings } from '../api'
+import { configured, loadSettings, updateConfigured } from '../settings'
 import { UiButton, UiCard, UiEmpty, UiSkeleton, UiTag, useToast } from '../components/ui'
 
 const toast = useToast()
@@ -87,15 +88,13 @@ const toast = useToast()
 const loading = ref(false)
 const loadError = ref('')
 const saving = ref(false)
-const configured = ref(false)
 const form = ref({ base_url: '', api_key: '', model: '' })
 
 async function load() {
   loading.value = true
   loadError.value = ''
   try {
-    const data = await getSettings()
-    configured.value = !!data?.configured
+    const data = await loadSettings()
     form.value = {
       base_url: data?.base_url || '',
       api_key: '',
@@ -118,7 +117,7 @@ async function save() {
     // api_key 留空 = 保持不变（后端语义：不传字段则不覆盖）
     if (form.value.api_key) body.api_key = form.value.api_key
     const data = await saveSettings(body)
-    configured.value = !!data?.configured
+    updateConfigured(data?.configured)
     form.value.api_key = ''
     toast.success('LLM 配置已保存，即时生效')
   } catch (e) {

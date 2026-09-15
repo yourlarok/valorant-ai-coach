@@ -83,13 +83,6 @@
   --topbar-h: 60px;
   --content-max-w: 1280px;
   --cut-size: 10px;
-
-  /* ---- 旧变量别名（页面重构前保持兼容，Task 4-6 逐步移除） ---- */
-  --bg: var(--c-bg);
-  --panel: var(--c-surface-2);
-  --accent: var(--c-accent);
-  --text: var(--c-text);
-  --muted: var(--c-text-muted);
 }
 
 * { box-sizing: border-box; }
@@ -107,15 +100,6 @@ body {
 }
 
 /* ---- 通用工具类 ---- */
-
-/* 面板（兼容旧页面） */
-.panel {
-  background: var(--c-surface-2);
-  border: 1px solid var(--c-border);
-  border-radius: var(--r-md);
-  padding: var(--sp-4);
-  box-shadow: var(--shadow-1);
-}
 
 .accent { color: var(--c-accent); }
 .muted { color: var(--c-text-muted); }

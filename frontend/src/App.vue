@@ -49,9 +49,9 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
+import { onMounted } from 'vue'
 import { playerName, setPlayerName } from './player'
-import { getSettings } from './api'
+import { configured as llmConfigured, loadSettings } from './settings'
 import { UiTag, UiToast } from './components/ui'
 
 const navItems = [
@@ -61,14 +61,11 @@ const navItems = [
   { to: '/settings', label: '设置' },
 ]
 
-const llmConfigured = ref(false)
-
 onMounted(async () => {
   try {
-    const data = await getSettings()
-    llmConfigured.value = !!data?.configured
+    await loadSettings()
   } catch {
-    llmConfigured.value = false
+    // 读取失败时状态未知，徽标保持默认（Mock 演示通道）
   }
 })
 
