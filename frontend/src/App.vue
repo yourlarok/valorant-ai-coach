@@ -35,6 +35,7 @@
           <UiTag tone="accent">{{ playerName }}</UiTag>
         </div>
         <div class="topbar__status">
+          <NotificationBell />
           <UiTag :tone="llmConfigured ? 'win' : 'firstblood'" dot>
             {{ llmConfigured ? 'LLM 已连接' : 'Mock 演示通道' }}
           </UiTag>
@@ -54,6 +55,7 @@ import { computed, onMounted } from 'vue'
 import { useRoute } from 'vue-router'
 import { playerName } from './player'
 import { configured as llmConfigured, loadSettings } from './settings'
+import NotificationBell from './components/NotificationBell.vue'
 import { UiTag, UiToast } from './components/ui'
 
 const route = useRoute()

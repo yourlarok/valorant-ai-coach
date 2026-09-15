@@ -13,6 +13,33 @@ export async function bindIdentity(name) {
   if (!r.ok) throw new Error((await r.json()).detail || '绑定身份失败')
   return r.json()
 }
+export async function getNotifications(unreadOnly = false) {
+  const r = await fetch(`${BASE}/notifications?unread_only=${unreadOnly}`)
+  if (!r.ok) throw new Error((await r.json()).detail || '获取通知失败')
+  return r.json()
+}
+export async function markNotificationRead(id) {
+  const r = await fetch(`${BASE}/notifications/${id}/read`, { method: 'POST' })
+  if (!r.ok) throw new Error((await r.json()).detail || '标记已读失败')
+  return r.json()
+}
+export async function markAllNotificationsRead() {
+  const r = await fetch(`${BASE}/notifications/read-all`, { method: 'POST' })
+  if (!r.ok) throw new Error((await r.json()).detail || '全部已读失败')
+  return r.json()
+}
+export async function getAutomation() {
+  const r = await fetch(`${BASE}/settings/automation`)
+  if (!r.ok) throw new Error((await r.json()).detail || '获取自动化设置失败')
+  return r.json()
+}
+export async function simulateNewMatch(name) {
+  const r = await fetch(`${BASE}/dev/simulate-new-match?name=${encodeURIComponent(name)}`, {
+    method: 'POST',
+  })
+  if (!r.ok) throw new Error((await r.json()).detail || '模拟新对局失败')
+  return r.json()
+}
 export async function putAutomation(body) {
   const r = await fetch(`${BASE}/settings/automation`, {
     method: 'PUT', headers: { 'Content-Type': 'application/json' },

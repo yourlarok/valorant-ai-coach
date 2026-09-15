@@ -66,6 +66,44 @@
       </div>
     </UiCard>
 
+    <!-- 自动化 -->
+    <UiCard title="自动化">
+      <UiSkeleton v-if="autoLoading" :lines="2" height="20px" />
+      <template v-else>
+        <div class="form">
+          <label class="switch">
+            <input v-model="autoForm.enabled" type="checkbox" />
+            <span class="switch__track" aria-hidden="true" />
+            <span class="switch__text">
+              <span class="field__label">自动分析新对局</span>
+              <span class="field__hint muted">
+                开启后后台定时检查新对局，自动完成深度分析并推送通知
+              </span>
+            </span>
+          </label>
+          <label class="field">
+            <span class="field__label">轮询间隔（分钟）</span>
+            <input
+              v-model.number="autoForm.poll_interval_min"
+              type="number"
+              min="1"
+              max="1440"
+              class="auto-interval"
+            />
+          </label>
+          <div class="form__actions">
+            <UiButton :disabled="autoSaving" @click="saveAutomation">
+              {{ autoSaving ? '保存中…' : '保存自动化设置' }}
+            </UiButton>
+            <UiButton variant="ghost" :disabled="simulating" @click="simulate">
+              {{ simulating ? '模拟中…' : '模拟新对局' }}
+            </UiButton>
+            <span class="muted">“模拟新对局”仅 fixture 演示数据源可用。</span>
+          </div>
+        </div>
+      </template>
+    </UiCard>
+
     <!-- 红线声明 -->
     <UiCard title="红线声明">
       <ul class="redline">
@@ -79,8 +117,9 @@
 
 <script setup>
 import { ref, onMounted } from 'vue'
-import { saveSettings } from '../api'
+import { getAutomation, putAutomation, saveSettings, simulateNewMatch } from '../api'
 import { configured, loadSettings, updateConfigured } from '../settings'
+import { playerName } from '../player'
 import { UiButton, UiCard, UiEmpty, UiSkeleton, UiTag, useToast } from '../components/ui'
 
 const toast = useToast()
@@ -89,6 +128,59 @@ const loading = ref(false)
 const loadError = ref('')
 const saving = ref(false)
 const form = ref({ base_url: '', api_key: '', model: '' })
+
+const autoLoading = ref(false)
+const autoSaving = ref(false)
+const simulating = ref(false)
+// 后端 PUT /settings/automation 要求全量字段，缺省字段会被默认值重置
+const autoForm = ref({ enabled: true, poll_interval_min: 5 })
+
+async function loadAutomation() {
+  autoLoading.value = true
+  try {
+    const data = await getAutomation()
+    autoForm.value = {
+      enabled: !!data?.enabled,
+      poll_interval_min: data?.poll_interval_min || 5,
+    }
+  } catch (e) {
+    toast.error(e.message || '获取自动化设置失败')
+  } finally {
+    autoLoading.value = false
+  }
+}
+
+async function saveAutomation() {
+  autoSaving.value = true
+  try {
+    const body = {
+      enabled: !!autoForm.value.enabled,
+      poll_interval_min: Math.max(1, Number(autoForm.value.poll_interval_min) || 5),
+    }
+    const data = await putAutomation(body)
+    autoForm.value = {
+      enabled: !!data?.enabled,
+      poll_interval_min: data?.poll_interval_min || body.poll_interval_min,
+    }
+    toast.success('自动化设置已保存')
+  } catch (e) {
+    toast.error(e.message || '保存失败，请重试')
+  } finally {
+    autoSaving.value = false
+  }
+}
+
+async function simulate() {
+  simulating.value = true
+  try {
+    await simulateNewMatch(playerName.value || '测试玩家#1234')
+    toast.success('已模拟，稍后在通知中心查看')
+  } catch (e) {
+    toast.error(e.message || '模拟失败，请重试')
+  } finally {
+    simulating.value = false
+  }
+}
 
 async function load() {
   loading.value = true
@@ -127,7 +219,10 @@ async function save() {
   }
 }
 
-onMounted(load)
+onMounted(() => {
+  load()
+  loadAutomation()
+})
 </script>
 
 <style scoped>
@@ -171,6 +266,49 @@ onMounted(load)
 
 .source__row { margin-bottom: var(--sp-2); }
 .source__text { margin: 0; }
+
+.switch {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-3);
+  cursor: pointer;
+}
+.switch input { position: absolute; opacity: 0; width: 0; height: 0; }
+.switch__track {
+  position: relative;
+  flex: 0 0 40px;
+  width: 40px;
+  height: 22px;
+  background: var(--c-surface-3);
+  border: 1px solid var(--c-border-strong);
+  border-radius: var(--r-lg);
+  transition: background var(--dur-base) var(--ease-out),
+    border-color var(--dur-base) var(--ease-out);
+}
+.switch__track::after {
+  content: '';
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: var(--c-text-muted);
+  transition: transform var(--dur-base) var(--ease-out),
+    background var(--dur-base) var(--ease-out);
+}
+.switch input:checked + .switch__track {
+  background: var(--c-accent-dim);
+  border-color: var(--c-accent);
+}
+.switch input:checked + .switch__track::after {
+  transform: translateX(18px);
+  background: var(--c-accent);
+}
+.switch input:focus-visible + .switch__track { border-color: var(--c-accent); }
+.switch__text { display: flex; flex-direction: column; gap: var(--sp-1); }
+
+.auto-interval { max-width: 160px; }
 
 .redline {
   margin: 0;
