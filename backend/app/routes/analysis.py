@@ -1,5 +1,6 @@
 import json
 
+import httpx
 from fastapi import APIRouter, HTTPException, Request
 
 from app.analysis.analyzer import analyze_match
@@ -28,8 +29,8 @@ def analyze(request: Request, match_id: str, name: str, rank_tier: str = "钻石
     primary, subs = match_archetypes(raws)
     try:
         analysis = analyze_match(match, name, raws, primary, subs, llm)
-    except (json.JSONDecodeError, ValueError):
-        # LLM 返回非法 JSON 时降级到模板化输出，避免接口 500
+    except (json.JSONDecodeError, ValueError, httpx.HTTPError, RuntimeError):
+        # LLM 返回非法 JSON、HTTP 调用失败或未配置等异常时降级到模板化输出，避免接口 500
         analysis = analyze_match(match, name, raws, primary, subs, None)
     problems = detect_problems(raws, baseline)
     return {
