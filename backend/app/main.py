@@ -15,6 +15,7 @@ from app.db import init_db
 from app.routes import analysis, coaching, matches
 from app.routes import notifications as notifications_route
 from app.routes import settings as settings_route
+from app.routes import training as training_route
 
 
 def create_app() -> FastAPI:
@@ -45,6 +46,7 @@ def create_app() -> FastAPI:
     app.include_router(coaching.router)
     app.include_router(settings_route.router)
     app.include_router(notifications_route.router)
+    app.include_router(training_route.router)
 
     dist = Path(__file__).resolve().parent.parent.parent / "frontend" / "dist"
     if dist.exists():

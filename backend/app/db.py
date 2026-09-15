@@ -6,6 +6,15 @@ from pathlib import Path
 
 from app.config import DB_PATH
 
+DRILLS = ("headline_flick", "reaction", "tracking")
+# reaction 科目分数是毫秒，越低越好；其余科目越高越好
+LOWER_IS_BETTER = {"reaction"}
+
+
+def _better(drill: str, a: float, b: float) -> float:
+    """返回 a、b 中对科目 drill 更好的成绩。"""
+    return min(a, b) if drill in LOWER_IS_BETTER else max(a, b)
+
 
 def _db_path() -> Path:
     override = os.environ.get("DB_PATH_OVERRIDE")
@@ -51,6 +60,20 @@ def init_db() -> None:
                 player_name TEXT NOT NULL,
                 analyzed_at TEXT NOT NULL
             )
+        """)
+        conn.execute("""
+            CREATE TABLE IF NOT EXISTS training_scores (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                player_name TEXT NOT NULL,
+                drill TEXT NOT NULL,
+                score REAL NOT NULL,
+                extra TEXT NOT NULL DEFAULT '{}',
+                created_at TEXT NOT NULL
+            )
+        """)
+        conn.execute("""
+            CREATE INDEX IF NOT EXISTS idx_training_scores_player_drill
+            ON training_scores (player_name, drill)
         """)
 
 
@@ -125,3 +148,54 @@ def mark_match_analyzed(match_id: str, player_name: str) -> None:
             "INSERT OR IGNORE INTO analyzed_matches (match_id, player_name, analyzed_at) VALUES (?,?,?)",
             (match_id, player_name, datetime.now(timezone.utc).isoformat()),
         )
+
+
+def best_score(player_name: str, drill: str) -> float | None:
+    with sqlite3.connect(_db_path()) as conn:
+        order = "ASC" if drill in LOWER_IS_BETTER else "DESC"
+        row = conn.execute(
+            f"SELECT score FROM training_scores WHERE player_name = ? AND drill = ?"
+            f" ORDER BY score {order} LIMIT 1",
+            (player_name, drill),
+        ).fetchone()
+    return row[0] if row else None
+
+
+def save_training_score(player_name: str, drill: str, score: float,
+                        extra: dict) -> tuple[float, bool]:
+    """写入成绩，返回 (历史最佳, 是否新纪录)。"""
+    prev_best = best_score(player_name, drill)
+    created_at = datetime.now(timezone.utc).isoformat()
+    with sqlite3.connect(_db_path()) as conn:
+        conn.execute(
+            "INSERT INTO training_scores (player_name, drill, score, extra, created_at)"
+            " VALUES (?,?,?,?,?)",
+            (player_name, drill, score, json.dumps(extra, ensure_ascii=False),
+             created_at),
+        )
+    if prev_best is None:
+        return score, True
+    best = _better(drill, prev_best, score)
+    return best, best == score and score != prev_best
+
+
+def load_training_scores(player_name: str,
+                         drill: str | None = None) -> tuple[list[dict], dict]:
+    """返回 (成绩列表按时间倒序, 各科最佳成绩)。"""
+    where = "WHERE player_name = ?"
+    params: list = [player_name]
+    if drill:
+        where += " AND drill = ?"
+        params.append(drill)
+    with sqlite3.connect(_db_path()) as conn:
+        rows = conn.execute(
+            f"SELECT drill, score, extra, created_at FROM training_scores"
+            f" {where} ORDER BY id DESC",
+            params,
+        ).fetchall()
+    scores = [{"drill": d, "score": s, "extra": json.loads(e), "created_at": c}
+              for d, s, e, c in rows]
+    bests: dict[str, float] = {}
+    for d, s, _, _ in rows:
+        bests[d] = s if d not in bests else _better(d, bests[d], s)
+    return scores, bests
