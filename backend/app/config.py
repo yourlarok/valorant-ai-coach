@@ -1,3 +1,4 @@
+import json
 from pathlib import Path
 
 from pydantic import BaseModel
@@ -6,6 +7,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 DATA_DIR = BASE_DIR / "data"
 DB_PATH = DATA_DIR / "coach.db"
 FIXTURE_DIR = BASE_DIR / "tests" / "fixtures"
+CONFIG_PATH = BASE_DIR / "config.json"
 
 
 class LLMSettings(BaseModel):
@@ -27,7 +29,13 @@ class Settings(BaseModel):
 
 
 def load_settings() -> Settings:
-    config_file = BASE_DIR / "config.json"
-    if config_file.exists():
-        return Settings.model_validate_json(config_file.read_text(encoding="utf-8"))
+    if CONFIG_PATH.exists():
+        return Settings.model_validate_json(CONFIG_PATH.read_text(encoding="utf-8"))
     return Settings()
+
+
+def save_settings(settings: Settings) -> None:
+    CONFIG_PATH.write_text(
+        json.dumps(settings.model_dump(), ensure_ascii=False, indent=2),
+        encoding="utf-8",
+    )
