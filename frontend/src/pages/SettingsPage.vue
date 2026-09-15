@@ -24,10 +24,10 @@
           <span class="field__label">Base URL</span>
           <input
             v-model.trim="form.base_url"
-            placeholder="https://api.openai.com/v1"
+            placeholder="https://api.deepseek.com/v1"
             spellcheck="false"
           />
-          <span class="field__hint muted">兼容 OpenAI 协议的任意服务端点</span>
+          <span class="field__hint muted">默认内置 DeepSeek，兼容 OpenAI 协议的端点均可替换</span>
         </label>
         <label class="field">
           <span class="field__label">API Key</span>
@@ -41,7 +41,7 @@
         </label>
         <label class="field">
           <span class="field__label">模型</span>
-          <input v-model.trim="form.model" placeholder="gpt-4o-mini" spellcheck="false" />
+          <input v-model.trim="form.model" placeholder="deepseek-chat" spellcheck="false" />
         </label>
         <div class="form__actions">
           <UiButton type="submit" :disabled="saving">

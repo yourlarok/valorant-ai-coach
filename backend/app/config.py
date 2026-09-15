@@ -1,4 +1,5 @@
 import json
+import os
 from pathlib import Path
 
 from pydantic import BaseModel
@@ -11,9 +12,10 @@ CONFIG_PATH = BASE_DIR / "config.json"
 
 
 class LLMSettings(BaseModel):
-    base_url: str = "https://api.openai.com/v1"
+    # 默认内置 DeepSeek（快速模型 deepseek-chat）；key 只存本地或走环境变量
+    base_url: str = "https://api.deepseek.com/v1"
     api_key: str = ""
-    model: str = "gpt-4o-mini"
+    model: str = "deepseek-chat"
 
 
 class WeGameSettings(BaseModel):
@@ -30,8 +32,15 @@ class Settings(BaseModel):
 
 def load_settings() -> Settings:
     if CONFIG_PATH.exists():
-        return Settings.model_validate_json(CONFIG_PATH.read_text(encoding="utf-8"))
-    return Settings()
+        settings = Settings.model_validate_json(CONFIG_PATH.read_text(encoding="utf-8"))
+    else:
+        settings = Settings()
+    # 环境变量兜底：DEEPSEEK_API_KEY 优先于空配置
+    if not settings.llm.api_key:
+        env_key = os.environ.get("DEEPSEEK_API_KEY", "")
+        if env_key:
+            settings.llm.api_key = env_key
+    return settings
 
 
 def save_settings(settings: Settings) -> None:

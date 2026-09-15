@@ -60,19 +60,23 @@ open http://127.0.0.1:8787
 
 **推荐方式：打开应用后进入"设置"页**，直接填写 LLM 的 `base_url` / `api_key` / `model`，保存即写入 `backend/config.json` 并热更新生效，无需重启服务。设置接口不会回显 api_key 明文。
 
-也可手动编辑 `backend/config.json`（不存在时使用默认值），参考 `backend/config.example.json`：
+**默认内置 DeepSeek**：`base_url` 默认指向 `https://api.deepseek.com/v1`，模型默认 `deepseek-chat`（DeepSeek 快速模型，价格便宜适合高频分析）。只需提供一个 DeepSeek API key 即可开箱使用，提供方式三选一：
+
+1. 设置页填写（推荐）；
+2. 环境变量 `DEEPSEEK_API_KEY`（优先级高于空配置）；
+3. 手动编辑 `backend/config.json`（不存在时使用默认值），参考 `backend/config.example.json`：
 
 ```json
 {
   "llm": {
-    "base_url": "https://api.openai.com/v1",
-    "api_key": "在这里填你的 key",
-    "model": "gpt-4o-mini"
+    "base_url": "https://api.deepseek.com/v1",
+    "api_key": "在这里填你的 DeepSeek key",
+    "model": "deepseek-chat"
   }
 }
 ```
 
-- **LLM**：兼容 OpenAI Chat Completions 协议的任意服务均可（改 `base_url` 与 `model` 即可接入国产模型）。不填 `api_key` 时文本分析自动使用内置 Mock 降级，结构保持一致。
+- **LLM**：兼容 OpenAI Chat Completions 协议的任意服务均可（改 `base_url` 与 `model` 即可换其他模型）。不填 `api_key` 时文本分析自动使用内置 Mock 降级，结构保持一致。
 - **数据源**：环境变量 `COLLECTOR` 控制采集器——
   - `COLLECTOR=fixture`（默认）：读取 `backend/tests/fixtures/` 演示数据；
   - `COLLECTOR=wegame`：走 WeGame 战绩接口（需先完成下方真机联调校准）。
