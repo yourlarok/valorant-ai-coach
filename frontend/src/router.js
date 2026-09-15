@@ -3,6 +3,7 @@ import HomePage from './pages/HomePage.vue'
 import MatchesPage from './pages/MatchesPage.vue'
 import ReportPage from './pages/ReportPage.vue'
 import PlanPage from './pages/PlanPage.vue'
+import RangePage from './pages/RangePage.vue'
 import SettingsPage from './pages/SettingsPage.vue'
 import OnboardingPage from './pages/OnboardingPage.vue'
 import { initIdentity, onboarded } from './player'
@@ -14,6 +15,7 @@ const router = createRouter({
     { path: '/matches', component: MatchesPage },
     { path: '/report/:matchId', component: ReportPage },
     { path: '/plan', component: PlanPage },
+    { path: '/range', component: RangePage },
     { path: '/settings', component: SettingsPage },
     {
       path: '/onboarding',

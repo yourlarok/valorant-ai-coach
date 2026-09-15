@@ -65,6 +65,7 @@ const navItems = [
   { to: '/', label: '总览' },
   { to: '/matches', label: '战绩' },
   { to: '/plan', label: '训练中心' },
+  { to: '/range', label: '训练场' },
   { to: '/settings', label: '设置' },
 ]
 

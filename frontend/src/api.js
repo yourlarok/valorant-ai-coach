@@ -83,6 +83,21 @@ export async function saveSettings(body) {
   if (!r.ok) throw new Error((await r.json()).detail || '保存 LLM 配置失败')
   return r.json()
 }
+export async function getTrainingScores(name, drill) {
+  let url = `${BASE}/training/scores?player=${encodeURIComponent(name)}`
+  if (drill) url += `&drill=${encodeURIComponent(drill)}`
+  const r = await fetch(url)
+  if (!r.ok) throw new Error((await r.json()).detail || '获取训练成绩失败')
+  return r.json()
+}
+export async function postTrainingScore(body) {
+  const r = await fetch(`${BASE}/training/scores`, {
+    method: 'POST', headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(body),
+  })
+  if (!r.ok) throw new Error((await r.json()).detail || '成绩上报失败')
+  return r.json()
+}
 export async function toggleTask(name, taskName, done) {
   const r = await fetch(`${BASE}/plan/toggle?name=${encodeURIComponent(name)}`, {
     method: 'POST', headers: { 'Content-Type': 'application/json' },
