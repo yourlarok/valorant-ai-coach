@@ -1,5 +1,11 @@
 <template>
-  <div class="shell">
+  <!-- 全屏路由（首次引导）：不渲染左侧导航与顶栏 -->
+  <template v-if="fullScreen">
+    <router-view />
+    <UiToast />
+  </template>
+
+  <div v-else class="shell">
     <aside class="sidebar">
       <div class="sidebar__brand">
         <span class="sidebar__logo cut-corner">VAL</span>
@@ -24,14 +30,9 @@
 
     <div class="main">
       <header class="topbar">
-        <div class="topbar__search">
-          <input
-            v-model="playerName"
-            class="topbar__input"
-            placeholder="搜索玩家：昵称#数字ID"
-            @change="saveName"
-            @keyup.enter="saveName"
-          />
+        <div class="topbar__identity">
+          <span class="topbar__identity-label muted">已绑定身份</span>
+          <UiTag tone="accent">{{ playerName }}</UiTag>
         </div>
         <div class="topbar__status">
           <UiTag :tone="llmConfigured ? 'win' : 'firstblood'" dot>
@@ -49,10 +50,14 @@
 </template>
 
 <script setup>
-import { onMounted } from 'vue'
-import { playerName, setPlayerName } from './player'
+import { computed, onMounted } from 'vue'
+import { useRoute } from 'vue-router'
+import { playerName } from './player'
 import { configured as llmConfigured, loadSettings } from './settings'
 import { UiTag, UiToast } from './components/ui'
+
+const route = useRoute()
+const fullScreen = computed(() => !!route.meta.fullScreen)
 
 const navItems = [
   { to: '/', label: '总览' },
@@ -68,10 +73,6 @@ onMounted(async () => {
     // 读取失败时状态未知，徽标保持默认（Mock 演示通道）
   }
 })
-
-function saveName() {
-  setPlayerName(playerName.value)
-}
 </script>
 
 <style scoped>
@@ -176,8 +177,8 @@ function saveName() {
   top: 0;
   z-index: 100;
 }
-.topbar__search { flex: 1; max-width: 420px; }
-.topbar__input { width: 100%; }
+.topbar__identity { display: flex; align-items: center; gap: var(--sp-2); }
+.topbar__identity-label { font-size: var(--fs-caption); letter-spacing: 0.06em; }
 .topbar__status { margin-left: auto; display: flex; align-items: center; gap: var(--sp-2); }
 
 .content {

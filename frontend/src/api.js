@@ -1,5 +1,26 @@
 const BASE = '/api'
 
+export async function getIdentity() {
+  const r = await fetch(`${BASE}/identity`)
+  if (!r.ok) throw new Error((await r.json()).detail || '获取身份信息失败')
+  return r.json()
+}
+export async function bindIdentity(name) {
+  const r = await fetch(`${BASE}/identity`, {
+    method: 'POST', headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ name }),
+  })
+  if (!r.ok) throw new Error((await r.json()).detail || '绑定身份失败')
+  return r.json()
+}
+export async function putAutomation(body) {
+  const r = await fetch(`${BASE}/settings/automation`, {
+    method: 'PUT', headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(body),
+  })
+  if (!r.ok) throw new Error((await r.json()).detail || '保存自动化设置失败')
+  return r.json()
+}
 export async function listMatches(name, count) {
   let url = `${BASE}/matches?name=${encodeURIComponent(name)}`
   if (count) url += `&count=${count}`

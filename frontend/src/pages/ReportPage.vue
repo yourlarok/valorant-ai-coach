@@ -2,9 +2,13 @@
   <div class="report">
     <UiCard v-if="!playerName" class="report__intro" cut>
       <UiEmpty
-        title="先填入你的玩家名"
-        description="在右上角填入玩家名（格式：昵称#数字ID）即可生成单场报告。"
-      />
+        title="先绑定你的游戏身份"
+        description="绑定玩家名（格式：昵称#数字ID）后即可生成单场报告。"
+      >
+        <router-link to="/onboarding">
+          <UiButton>去绑定身份</UiButton>
+        </router-link>
+      </UiEmpty>
     </UiCard>
 
     <template v-else-if="loading">

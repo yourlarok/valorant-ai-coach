@@ -1,19 +1,14 @@
 <template>
   <div class="dash">
-    <!-- 空态：未设置玩家名 -->
+    <!-- 空态：未绑定身份 -->
     <UiCard v-if="!playerName" class="dash__intro" cut>
       <UiEmpty
         title="欢迎来到无畏契约 AI 对局教练"
-        description="填入你的玩家名（格式：昵称#数字ID）即可生成档案卡、六维评分与今日训练待办。演示玩家：测试玩家#1234"
+        description="先绑定你的游戏身份（昵称#数字ID），即可生成档案卡、六维评分与今日训练待办。"
       >
-        <div class="dash__intro-form">
-          <input
-            v-model="nameInput"
-            placeholder="昵称#数字ID"
-            @keyup.enter="save"
-          />
-          <UiButton @click="save">开始分析</UiButton>
-        </div>
+        <router-link to="/onboarding">
+          <UiButton>去绑定身份</UiButton>
+        </router-link>
       </UiEmpty>
     </UiCard>
 
@@ -118,14 +113,13 @@
 <script setup>
 import { ref, computed, onMounted, watch } from 'vue'
 import { listMatches, getAnalysis, getWeekly, getPlan } from '../api'
-import { playerName, setPlayerName } from '../player'
+import { playerName } from '../player'
 import RadarChart from '../components/RadarChart.vue'
 import ShareCard from '../components/ShareCard.vue'
 import PlayerCard from '../components/PlayerCard.vue'
 import TrendMini from '../components/TrendMini.vue'
 import { UiButton, UiCard, UiEmpty, UiSkeleton, UiTag } from '../components/ui'
 
-const nameInput = ref('')
 const loading = ref(false)
 const error = ref('')
 const matches = ref([])
@@ -160,12 +154,6 @@ const extStats = computed(() => {
 })
 
 const todoTasks = computed(() => planTasks.value.filter((t) => !t.done).slice(0, 3))
-
-function save() {
-  const name = nameInput.value.trim()
-  if (!name) return
-  setPlayerName(name)
-}
 
 // 主数据：对局列表 + 最近一场深度分析（阻塞渲染）
 async function load() {
@@ -254,12 +242,6 @@ watch(playerName, (name, prev) => {
 }
 
 .dash__intro { grid-column: 1 / -1; }
-.dash__intro-form {
-  display: flex;
-  gap: var(--sp-2);
-  justify-content: center;
-}
-.dash__intro-form input { width: 260px; }
 
 .dash__skeleton { grid-column: span 6; }
 
