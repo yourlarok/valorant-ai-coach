@@ -403,12 +403,14 @@ def compute_raws(matches: list[Match], player_name: str) -> DimensionRaws:
 
 def _percentile_score(value: float, dim: DimensionBaseline, lower_is_better: bool = False) -> float:
     if lower_is_better:
-        value = -value
-        median, p90 = -dim.median, -dim.p90
-        if p90 < median:
-            median, p90 = p90, median
-    else:
-        median, p90 = dim.median, dim.p90
+        if dim.median <= 0:
+            return 50.0
+        if value <= dim.median:
+            # 好于中位数：越接近 0 分越高，median 映射 50，0 映射 100
+            return min(100.0, 50.0 + 50.0 * (dim.median - value) / dim.median)
+        # 差于中位数：按相对偏差从 50 递减，最低钳到 0
+        return max(0.0, 50.0 - 50.0 * (value - dim.median) / dim.median)
+    median, p90 = dim.median, dim.p90
     if value <= median:
         return max(0.0, 50.0 * value / median) if median else 50.0
     span = p90 - median
