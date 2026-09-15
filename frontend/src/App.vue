@@ -102,7 +102,7 @@ function saveName() {
 .sidebar__brand-text { display: flex; flex-direction: column; line-height: 1.2; }
 .sidebar__title { font-size: var(--fs-h3); font-weight: 700; }
 .sidebar__subtitle {
-  font-size: 10px;
+  font-size: var(--fs-micro);
   letter-spacing: 0.18em;
   color: var(--c-text-faint);
 }

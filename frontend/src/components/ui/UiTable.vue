@@ -17,7 +17,7 @@
           <td
             v-for="col in columns"
             :key="col.key"
-            :class="{ num: col.numeric !== false }"
+            :class="{ num: col.numeric }"
             :style="{ textAlign: col.align || 'left' }"
           >
             <slot :name="`cell-${col.key}`" :row="row" :value="row[col.key]" :column="col">
@@ -28,7 +28,9 @@
       </tbody>
       <tbody v-else>
         <tr>
-          <td class="ui-table__empty" :colspan="columns.length">{{ emptyText }}</td>
+          <td class="ui-table__empty" :colspan="columns.length">
+            <UiEmpty :title="emptyText" />
+          </td>
         </tr>
       </tbody>
     </table>
@@ -36,6 +38,8 @@
 </template>
 
 <script setup>
+import UiEmpty from './UiEmpty.vue'
+
 defineProps({
   columns: { type: Array, required: true },
   rows: { type: Array, default: () => [] },
@@ -71,9 +75,5 @@ defineProps({
   transition: background var(--dur-fast) var(--ease-out);
 }
 .ui-table tbody tr:hover { background: var(--c-surface-3); }
-.ui-table__empty {
-  padding: var(--sp-5) var(--sp-3);
-  text-align: center;
-  color: var(--c-text-faint);
-}
+.ui-table__empty { padding: 0; }
 </style>

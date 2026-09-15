@@ -17,32 +17,7 @@
 </template>
 
 <script setup>
-import { reactive, provide } from 'vue'
-import { TOAST_KEY } from './toast'
-
-let seq = 0
-const toasts = reactive([])
-
-function dismiss(id) {
-  const i = toasts.findIndex((t) => t.id === id)
-  if (i !== -1) toasts.splice(i, 1)
-}
-
-function push(message, tone = 'info', duration = 3200) {
-  const id = ++seq
-  toasts.push({ id, message, tone })
-  setTimeout(() => dismiss(id), duration)
-  return id
-}
-
-const api = {
-  push,
-  success: (msg, duration) => push(msg, 'success', duration),
-  error: (msg, duration) => push(msg, 'error', duration),
-  info: (msg, duration) => push(msg, 'info', duration),
-}
-
-provide(TOAST_KEY, api)
+import { toasts } from '../../toast'
 </script>
 
 <style scoped>

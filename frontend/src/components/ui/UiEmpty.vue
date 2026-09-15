@@ -1,7 +1,7 @@
 <template>
   <div class="ui-empty">
     <div class="ui-empty__mark cut-corner" aria-hidden="true">
-      <slot name="icon">?</slot>
+      <slot name="icon"><span class="ui-empty__glyph" /></slot>
     </div>
     <p class="ui-empty__title">{{ title }}</p>
     <p v-if="description" class="ui-empty__desc">{{ description }}</p>
@@ -38,6 +38,12 @@ defineProps({
   font-size: var(--fs-h2);
   font-weight: 700;
   margin-bottom: var(--sp-2);
+}
+.ui-empty__glyph {
+  width: 14px;
+  height: 14px;
+  border: 2px solid currentColor;
+  transform: rotate(45deg);
 }
 .ui-empty__title {
   margin: 0;

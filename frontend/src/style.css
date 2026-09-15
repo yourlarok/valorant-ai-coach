@@ -28,6 +28,8 @@
   --c-win-dim: rgba(30, 201, 142, 0.14);
   --c-loss: #ff4655;
   --c-loss-dim: rgba(255, 70, 85, 0.14);
+  --c-draw: #8ba3b5;
+  --c-draw-dim: rgba(139, 163, 181, 0.14);
   --c-firstblood: #f7b32b;
   --c-firstblood-dim: rgba(247, 179, 43, 0.14);
   --c-warn: #ff9f1c;
@@ -43,8 +45,11 @@
   --fs-body: 14px;
   --fs-caption: 12px;
   --fs-data: 28px;
+  --fs-micro: 10px;
 
   --font-ui: "PingFang SC", "Microsoft YaHei", "Helvetica Neue", sans-serif;
+  /* 决策：不打包字体文件。Rajdhani 未加载时走系统 fallback——
+     macOS 命中 DIN Alternate、Windows 命中 Bahnschrift，均为等宽风格数字字体。 */
   --font-num: "Rajdhani", "Bahnschrift", "DIN Alternate", "SF Mono",
     ui-monospace, "PingFang SC", monospace;
 
@@ -77,6 +82,7 @@
   --sidebar-w: 216px;
   --topbar-h: 60px;
   --content-max-w: 1280px;
+  --cut-size: 10px;
 
   /* ---- 旧变量别名（页面重构前保持兼容，Task 4-6 逐步移除） ---- */
   --bg: var(--c-bg);
@@ -123,10 +129,23 @@ body {
 
 /* Valorant 棱角切割装饰 */
 .cut-corner {
-  clip-path: polygon(0 0, calc(100% - 10px) 0, 100% 10px, 100% 100%, 10px 100%, 0 calc(100% - 10px));
+  clip-path: polygon(
+    0 0,
+    calc(100% - var(--cut-size)) 0,
+    100% var(--cut-size),
+    100% 100%,
+    var(--cut-size) 100%,
+    0 calc(100% - var(--cut-size))
+  );
 }
 .cut-corner-tr {
-  clip-path: polygon(0 0, calc(100% - 12px) 0, 100% 12px, 100% 100%, 0 100%);
+  clip-path: polygon(
+    0 0,
+    calc(100% - var(--cut-size)) 0,
+    100% var(--cut-size),
+    100% 100%,
+    0 100%
+  );
 }
 
 /* ---- 基础控件（兼容旧页面） ---- */

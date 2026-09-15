@@ -11,7 +11,7 @@ defineProps({
     type: String,
     default: 'neutral',
     validator: (v) =>
-      ['neutral', 'accent', 'win', 'loss', 'firstblood', 'warn', 'info'].includes(v),
+      ['neutral', 'accent', 'win', 'loss', 'draw', 'firstblood', 'warn', 'info'].includes(v),
   },
   dot: { type: Boolean, default: false },
 })
@@ -40,6 +40,7 @@ defineProps({
 .ui-tag--accent { background: var(--c-accent-dim); color: var(--c-accent); }
 .ui-tag--win { background: var(--c-win-dim); color: var(--c-win); }
 .ui-tag--loss { background: var(--c-loss-dim); color: var(--c-loss); }
+.ui-tag--draw { background: var(--c-draw-dim); color: var(--c-draw); }
 .ui-tag--firstblood { background: var(--c-firstblood-dim); color: var(--c-firstblood); }
 .ui-tag--warn { background: var(--c-warn-dim); color: var(--c-warn); }
 .ui-tag--info { background: var(--c-info-dim); color: var(--c-info); }
