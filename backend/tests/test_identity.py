@@ -59,3 +59,15 @@ def test_rebind_replaces_identity(client):
     resp = client.post("/api/identity", json={"name": PLAYER})
     assert resp.status_code == 200
     assert list_profile_names().count(PLAYER) == 1
+
+
+def test_rebind_removes_old_profile_from_polling(client):
+    # fixture 对局中该玩家以队友身份出场，查得到对局，可作为换绑目标
+    player_b = "蓝队队友一#2001"
+    assert client.post("/api/identity", json={"name": PLAYER}).status_code == 200
+    assert PLAYER in list_profile_names()
+
+    assert client.post("/api/identity", json={"name": player_b}).status_code == 200
+    # 旧身份档案被移除，自动化轮询（遍历 list_profile_names）只为新身份工作
+    assert list_profile_names() == [player_b]
+    assert client.get("/api/identity").json() == {"name": player_b, "onboarded": True}

@@ -134,6 +134,13 @@ def list_profile_names() -> list[str]:
     return [r[0] for r in rows]
 
 
+def remove_profile(name: str) -> None:
+    """移除档案表记录，使自动化轮询不再为该玩家工作。
+    仅删 profiles 行，不影响训练成绩 / 通知 / 已分析标记等历史数据。"""
+    with sqlite3.connect(_db_path()) as conn:
+        conn.execute("DELETE FROM profiles WHERE name = ?", (name,))
+
+
 def is_match_analyzed(match_id: str) -> bool:
     with sqlite3.connect(_db_path()) as conn:
         row = conn.execute(
