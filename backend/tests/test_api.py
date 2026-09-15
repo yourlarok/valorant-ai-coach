@@ -10,6 +10,8 @@ from app.main import create_app
 def client(tmp_path, monkeypatch):
     monkeypatch.setenv("COLLECTOR", "fixture")
     monkeypatch.setenv("DB_PATH_OVERRIDE", str(tmp_path / "test.db"))
+    # 避免在导出过该环境变量的机器上测试真打 DeepSeek API
+    monkeypatch.delenv("DEEPSEEK_API_KEY", raising=False)
     app = create_app()
     return TestClient(app)
 

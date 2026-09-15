@@ -79,7 +79,9 @@ class AutomationEngine:
         while True:
             try:
                 for name in list_profile_names():
-                    made = process_new_matches(app, name)
+                    # 链路内含同步 httpx 的 LLM 调用，放线程池执行，
+                    # 避免卡死事件循环，stop() 取消也能及时生效
+                    made = await asyncio.to_thread(process_new_matches, app, name)
                     if made:
                         logger.info("自动化分析 %s：新增 %d 条通知", name, len(made))
             except Exception:
