@@ -45,3 +45,26 @@ def test_median_maps_to_50():
     )
     scores = compute_scores(raws, baseline)
     assert abs(scores.aim - 50) < 1e-6
+
+
+def test_consistency_lower_is_better_bounds():
+    from app.analysis.metrics import DimensionRaws
+    baseline = load_baseline("钻石")
+
+    def _raws(cv: float) -> "DimensionRaws":
+        return DimensionRaws(
+            aim_hs_rate=baseline.aim.median,
+            duel_first_blood_diff=baseline.duel.median,
+            duel_first_duel_winrate=baseline.duel.median,
+            awareness_clutch_proxy=baseline.awareness.median,
+            economy_spend_per_round=baseline.economy.median,
+            utility_casts_per_round=baseline.utility.median,
+            consistency_acs_cv=cv,
+        )
+
+    # 极差：cv 远高于 median，得分应 <50 且不跌破 0
+    bad = compute_scores(_raws(1.0), baseline)
+    assert 0 <= bad.consistency < 50
+    # 极好：cv 接近 0，得分应 >50 且不超过 100
+    good = compute_scores(_raws(0.01), baseline)
+    assert 50 < good.consistency <= 100
