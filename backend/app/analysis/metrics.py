@@ -44,7 +44,8 @@ def compute_raws(matches: list[Match], player_name: str) -> DimensionRaws:
     fd = sum(p.first_deaths for _, p in stats)
     rounds = sum(max(m.blue_score + m.red_score, 1) for m, _ in stats)
     casts = sum(sum(p.ability_casts.values()) for _, p in stats)
-    acs_values = [p.score / max(m.blue_score + m.red_score, 1) for m, p in stats]
+    # score 字段本身即 ACS（场均口径），无需再除以回合数
+    acs_values = [float(p.score) for _, p in stats]
 
     hs_rate = hs / kills if kills else 0.0
     fb_diff = float(fb - fd)
