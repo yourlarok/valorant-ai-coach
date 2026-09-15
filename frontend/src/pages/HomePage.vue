@@ -36,13 +36,12 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed, onMounted, watch } from 'vue'
 import { listMatches, getAnalysis } from '../api'
+import { playerName, setPlayerName } from '../player'
 import RadarChart from '../components/RadarChart.vue'
 import ShareCard from '../components/ShareCard.vue'
 
-const STORAGE_KEY = 'val_player_name'
-const playerName = ref('')
 const nameInput = ref('')
 const loading = ref(false)
 const error = ref('')
@@ -53,18 +52,12 @@ const subTitles = computed(() => {
   return subs.map((s) => (typeof s === 'string' ? s : s.title || s.name || String(s)))
 })
 
-const overall = computed(() => {
-  const vals = Object.values(result.value?.scores || {})
-  if (!vals.length) return 0
-  return Math.round(vals.reduce((a, b) => a + b, 0) / vals.length)
-})
+const overall = computed(() => Math.round(result.value?.scores?.overall ?? 0))
 
 function save() {
   const name = nameInput.value.trim()
   if (!name) return
-  localStorage.setItem(STORAGE_KEY, name)
-  playerName.value = name
-  load()
+  setPlayerName(name)
 }
 
 async function load() {
@@ -87,8 +80,11 @@ async function load() {
 }
 
 onMounted(() => {
-  playerName.value = localStorage.getItem(STORAGE_KEY) || ''
   if (playerName.value) load()
+})
+
+watch(playerName, (name, prev) => {
+  if (name && name !== prev) load()
 })
 </script>
 

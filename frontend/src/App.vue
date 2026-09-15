@@ -23,17 +23,10 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
-
-const STORAGE_KEY = 'val_player_name'
-const playerName = ref('')
-
-onMounted(() => {
-  playerName.value = localStorage.getItem(STORAGE_KEY) || ''
-})
+import { playerName, setPlayerName } from './player'
 
 function saveName() {
-  localStorage.setItem(STORAGE_KEY, playerName.value.trim())
+  setPlayerName(playerName.value)
 }
 </script>
 

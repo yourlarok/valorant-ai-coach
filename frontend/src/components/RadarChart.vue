@@ -19,7 +19,7 @@ const AXES = [
   ['duel', '对枪'],
   ['awareness', '意识'],
   ['economy', '经济'],
-  ['ability', '技能'],
+  ['utility', '技能'],
   ['consistency', '稳定'],
 ]
 

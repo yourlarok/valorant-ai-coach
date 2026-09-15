@@ -36,12 +36,7 @@ const props = defineProps({
 
 const cardEl = ref(null)
 
-const grade = computed(() => {
-  const vals = Object.values(props.scores || {})
-  if (!vals.length) return '—'
-  const avg = vals.reduce((a, b) => a + b, 0) / vals.length
-  return avg >= 70 ? 'S' : 'A'
-})
+const grade = computed(() => props.scores?.grade || '—')
 
 async function saveImage() {
   const canvas = await html2canvas(cardEl.value, { backgroundColor: '#0f1923' })
