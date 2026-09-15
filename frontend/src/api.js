@@ -14,6 +14,7 @@ export async function getAnalysis(matchId, name) {
 }
 export async function getPlan(name) {
   const r = await fetch(`${BASE}/plan?name=${encodeURIComponent(name)}`)
+  if (!r.ok) throw new Error((await r.json()).detail || '获取训练计划失败')
   return r.json()
 }
 export async function toggleTask(name, taskName, done) {
@@ -21,5 +22,8 @@ export async function toggleTask(name, taskName, done) {
     method: 'POST', headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ task_name: taskName, done }),
   })
-  return r.json()
+  if (!r.ok) throw new Error((await r.json()).detail || '打卡保存失败')
+  const data = await r.json()
+  if (!data?.ok) throw new Error('打卡保存失败')
+  return data
 }
