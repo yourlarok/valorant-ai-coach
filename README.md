@@ -1,18 +1,96 @@
 # 无畏契约 AI 对局教练
 
-分析本人《无畏契约》对局数据并给出 AI 复盘点评的本地工具。
+分析本人《无畏契约》（国服）对局数据的本地工具：拉取战绩 → 六维能力评分 → 风格定位 → AI 复盘点评 → 生成针对性训练计划并打卡追踪。所有数据保存在本地 SQLite，不对外上传。
 
-## 红线声明
+## 红线声明（合规）
 
-本项目仅分析本人账号及公开数据，所有凭证与数据只保存在本地，不对外上传、不用于任何违反游戏规则与平台条款的用途。
+- 仅分析**本人账号**的对局数据及公开数据；
+- 所有凭证（LLM API Key、WeGame Cookie 等）只保存在本地 `backend/config.json`，不上传、不分享；
+- 不注入、不修改游戏客户端，不读取游戏内存，仅通过战绩接口获取事后数据；
+- 不用于任何违反游戏规则与平台条款的用途（代练、演员行为分析他人等）。
+
+## 功能列表（P1 MVP）
+
+- **战绩查询**：对局列表与单场详情（Fixture 演示数据 / WeGame 数据源可切换）；
+- **六维能力评分**：瞄准、对枪、意识、经济、道具、稳定性六个维度打分并给出总评与等级（S/A/B/C/D）；
+- **风格定位**：基于数据匹配风格原型（如"爆头机器""敢死队"），含副标签；
+- **AI 复盘点评**：LLM 生成单场对局文字复盘；未配置 key 或 LLM 网络异常时自动降级为模板分析，功能不中断；
+- **分享卡片**：报告页可生成风格称号分享卡片；
+- **训练计划**：根据检测到的问题生成针对性训练任务（如爆头率偏低 → Aim Lab 专项），支持打卡持久化与复测趋势。
+
+## 技术栈
+
+- 后端：FastAPI + SQLite（`backend/`，24 个 pytest 测试）
+- 前端：Vue 3 SPA（`frontend/`，Vite 构建，产物由后端托管）
 
 ## 快速开始
 
-（占位，后续任务补全）
+```bash
+# 1. 构建前端
+cd frontend && npm install && npm run build && cd ..
+
+# 2. 一键启动（自动建 venv、装依赖、起 uvicorn，托管前端 dist）
+./start-local.sh
+
+# 3. 浏览器打开
+open http://127.0.0.1:8787
+```
+
+默认使用 Fixture 演示数据源（内置玩家 `测试玩家#1234`），开箱即可走通全流程：
+输入玩家名 → 首页风格卡片 → 战绩列表 → 单场报告 → 训练计划打卡。
+
+<!-- 截图占位：首页 / 报告页 / 训练计划页 -->
+
+## 配置说明
+
+配置文件为 `backend/config.json`（不存在时使用默认值），参考 `backend/config.example.json`：
+
+```json
+{
+  "llm": {
+    "base_url": "https://api.openai.com/v1",
+    "api_key": "在这里填你的 key",
+    "model": "gpt-4o-mini"
+  }
+}
+```
+
+- **LLM**：兼容 OpenAI Chat Completions 协议的任意服务均可（改 `base_url` 与 `model` 即可接入国产模型）。不填 `api_key` 时文本分析自动使用模板降级。
+- **数据源**：环境变量 `COLLECTOR` 控制采集器——
+  - `COLLECTOR=fixture`（默认）：读取 `backend/tests/fixtures/` 演示数据；
+  - `COLLECTOR=wegame`：走 WeGame 战绩接口（需先完成下方真机联调校准）。
+
+## WeGame 真机联调清单（人工验收）
+
+WeGame 端点结构与字段映射已实现并有 mock 测试覆盖，但真实端点**需要抓包校准**后方可使用：
+
+1. Windows 本机登录 WeGame，进入无畏契约战绩页；
+2. 抓包确认战绩列表 / 对局详情的真实请求 URL、参数与鉴权方式（Cookie / token）；
+3. 校准 `backend/app/config.py` 中 `WeGameSettings` 的 `base_url` / `match_list_path` / `match_detail_path`；
+4. 校准 `backend/app/collector/wegame.py` 中 `map_wegame_detail` 的字段映射，使其与真实响应一致；
+5. `COLLECTOR=wegame ./start-local.sh` 启动，用本人账号验证战绩拉取与分析链路。
+
+## 测试
 
 ```bash
-cd backend
-python3 -m venv .venv
-.venv/bin/pip install -r requirements.txt
-.venv/bin/python -m pytest tests/ -v
+cd backend && .venv/bin/python -m pytest tests/ -v   # 预期 24 passed
+cd frontend && npm run build                          # 预期构建成功
+```
+
+## 路线图
+
+- **P2**：视觉复盘（回合时间线、站位热力图）、历史趋势分析、多赛季对比；
+- **P3**：更多风格原型与精细化标签、训练计划自适应调整、移动端适配。
+
+## 目录结构
+
+```
+backend/            FastAPI 后端
+  app/analysis/     LLM 客户端与文本分析器（含降级）
+  app/coaching/     评分引擎、风格原型、规则库、训练计划
+  app/collector/    Fixture / WeGame 采集器
+  app/routes/       matches / analysis / plan API
+  tests/            24 个 pytest 测试 + fixtures
+frontend/           Vue 3 SPA（构建产物由后端托管）
+start-local.sh      一键启动脚本
 ```
