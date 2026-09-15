@@ -58,17 +58,24 @@
           </div>
           <p class="shell__result-kicker muted">{{ title }} · 成绩卡</p>
           <div class="shell__result-score">
-            <span class="shell__result-num num">{{ lastResult?.score.toFixed(1) }}</span>
-            <span class="shell__result-unit muted">本次成绩</span>
+            <span class="shell__result-num num">{{ lastResult?.score.toFixed(decimals) }}</span>
+            <span class="shell__result-unit muted">
+              本次成绩{{ unit ? `（${unit}）` : '' }}
+            </span>
           </div>
           <div class="shell__result-best">
-            <span class="muted">历史最佳</span>
+            <span class="muted">历史最佳{{ lowerIsBetter ? '（越低越好）' : '' }}</span>
             <span class="num" :class="{ accent: isRecord }">
-              {{ best != null ? best.toFixed(1) : '—' }}
+              {{ best != null ? best.toFixed(decimals) : '—' }}{{ unit && best != null ? unit : '' }}
             </span>
           </div>
           <div v-if="extraStats.length" class="shell__result-extra">
-            <div v-for="s in extraStats" :key="s.label" class="shell__result-stat">
+            <div
+              v-for="s in extraStats"
+              :key="s.label"
+              class="shell__result-stat"
+              :class="{ 'shell__result-stat--wide': s.wide }"
+            >
               <span class="shell__result-stat-value num">{{ s.value }}</span>
               <span class="shell__result-stat-label muted">{{ s.label }}</span>
             </div>
@@ -94,6 +101,9 @@ const props = defineProps({
   drill: { type: String, required: true },
   title: { type: String, required: true },
   duration: { type: Number, default: 60 },
+  unit: { type: String, default: '' },
+  decimals: { type: Number, default: 1 },
+  lowerIsBetter: { type: Boolean, default: false },
 })
 const emit = defineEmits(['finish', 'exit'])
 
@@ -101,6 +111,18 @@ const EXTRA_LABELS = {
   hits: '命中数',
   shots: '开枪数',
   avg_reaction_ms: '平均反应',
+  coverage_s: '覆盖时长',
+  fouls: '抢跑次数',
+  rounds: '每轮明细',
+}
+
+function formatExtra(key, value) {
+  if (key === 'rounds' && Array.isArray(value)) {
+    return value.map((r) => (r.foul ? `抢跑 +${r.ms}` : `${Math.round(r.ms)}ms`)).join(' / ')
+  }
+  if (key === 'avg_reaction_ms') return `${value}ms`
+  if (key === 'coverage_s') return `${value}s`
+  return `${value}`
 }
 
 const state = ref('ready') // ready | countdown | playing | result
@@ -118,20 +140,25 @@ const playing = computed(() => state.value === 'playing' && timeLeft.value > 0)
 const extraStats = computed(() => {
   const extra = lastResult.value?.extra || {}
   return Object.entries(EXTRA_LABELS)
-    .filter(([key]) => typeof extra[key] === 'number')
+    .filter(([key]) => typeof extra[key] === 'number' || (key === 'rounds' && Array.isArray(extra[key])))
     .map(([key, label]) => ({
       label,
-      value: key === 'avg_reaction_ms' ? `${extra[key]}ms` : `${extra[key]}`,
+      value: formatExtra(key, extra[key]),
+      wide: key === 'rounds',
     }))
 })
 
 let countdownTimer = null
 let clockRaf = null
 let clockStart = 0
+let fallbackTimer = null
+
+const REPORT_GRACE_MS = 500 // 时间归零后等科目自行结算的宽限，超时由外壳兜底
 
 function clearTimers() {
   if (countdownTimer) { clearInterval(countdownTimer); countdownTimer = null }
   if (clockRaf) { cancelAnimationFrame(clockRaf); clockRaf = null }
+  if (fallbackTimer) { clearTimeout(fallbackTimer); fallbackTimer = null }
 }
 
 function startCountdown() {
@@ -162,7 +189,12 @@ function startClock() {
     if (left > 0) {
       clockRaf = requestAnimationFrame(tick)
     } else {
-      clockRaf = null // 时间到，等待科目组件结算后调用 report
+      clockRaf = null
+      // 科目应在 active 翻 false 后自行结算；宽限期内未 report 则由外壳以当前 hud 兜底
+      fallbackTimer = setTimeout(() => {
+        fallbackTimer = null
+        report({ score: hud.score, extra: { hits: hud.hits, shots: hud.shots } })
+      }, REPORT_GRACE_MS)
     }
   }
   clockRaf = requestAnimationFrame(tick)
@@ -341,6 +373,7 @@ onUnmounted(clearTimers)
 }
 .shell__result-extra {
   display: flex;
+  flex-wrap: wrap;
   justify-content: center;
   gap: var(--sp-5);
   padding: var(--sp-3) 0;
@@ -349,6 +382,8 @@ onUnmounted(clearTimers)
   margin-bottom: var(--sp-3);
 }
 .shell__result-stat { display: flex; flex-direction: column; line-height: 1.3; }
+.shell__result-stat--wide { flex-basis: 100%; }
+.shell__result-stat--wide .shell__result-stat-value { font-size: var(--fs-caption); font-weight: 500; }
 .shell__result-stat-value { font-size: var(--fs-h2); font-weight: 700; }
 .shell__result-stat-label { font-size: var(--fs-micro); letter-spacing: 0.1em; }
 .shell__result-error { color: var(--c-loss); font-size: var(--fs-caption); margin: 0 0 var(--sp-2); }

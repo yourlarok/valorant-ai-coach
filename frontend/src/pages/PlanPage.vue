@@ -52,6 +52,19 @@
               </div>
               <p class="task__detail muted">{{ t.detail }}</p>
             </div>
+            <span
+              v-if="drillForTask(t)"
+              class="task__go"
+              @click.stop
+            >
+              <router-link
+                :to="{ path: '/range', query: { drill: drillForTask(t) } }"
+                class="task__go-link"
+                @click.stop
+              >
+                去训练场 →
+              </router-link>
+            </span>
           </label>
         </div>
       </UiCard>
@@ -113,6 +126,25 @@ const DIMS = [
 ]
 
 const TAG_TONES = ['accent', 'win', 'info', 'firstblood', 'warn', 'loss']
+
+// dimension → 内置科目映射；任务卡无 dimension 字段，按后端规则表任务名反查
+const DRILL_BY_DIMENSION = {
+  aim: 'headline_flick',
+  duel: 'reaction',
+  consistency: 'tracking',
+}
+const DIMENSION_BY_TASK = {
+  'Sixshot 精准爆头': 'aim',
+  爆头死斗: 'aim',
+  预瞄点位练习: 'duel',
+  死斗抢首发: 'duel',
+  固定热身流程: 'consistency',
+}
+
+function drillForTask(task) {
+  const dim = DIMENSION_BY_TASK[task.name]
+  return dim ? DRILL_BY_DIMENSION[dim] : null
+}
 
 const compareColumns = [
   { key: 'label', label: '维度' },
@@ -305,6 +337,16 @@ watch(playerName, (name, prev) => {
 }
 .task__freq { font-size: var(--fs-caption); }
 .task__detail { margin: var(--sp-2) 0 0; font-size: var(--fs-body); }
+.task__go { flex-shrink: 0; align-self: center; }
+.task__go-link {
+  font-size: var(--fs-caption);
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  color: var(--c-accent);
+  text-decoration: none;
+  white-space: nowrap;
+}
+.task__go-link:hover { color: var(--c-accent-hover); text-decoration: underline; }
 
 /* 复测对比 */
 .plan__compare-note { margin: 0 0 var(--sp-2); }
