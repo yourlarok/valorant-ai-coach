@@ -115,11 +115,8 @@ const me = computed(() =>
 )
 const myTeam = computed(() => me.value?.team || '')
 
-const rounds = computed(() =>
-  (match.value?.blue_score ?? 0) + (match.value?.red_score ?? 0)
-)
 function acs(p) {
-  return rounds.value > 0 ? Math.round(p.score / rounds.value) : '—'
+  return p.score
 }
 
 const boardRows = computed(() => {
@@ -136,14 +133,19 @@ async function load() {
   match.value = null
   try {
     const [matches, analysis] = await Promise.all([
-      listMatches(playerName.value),
+      listMatches(playerName.value, 50),
       getAnalysis(route.params.matchId, playerName.value),
     ])
-    report.value = analysis
-    match.value =
+    const found =
       (Array.isArray(matches) ? matches : []).find(
         (m) => m.match_id === route.params.matchId
       ) || null
+    if (!found) {
+      error.value = '找不到该对局的详情数据，无法生成报告'
+      return
+    }
+    report.value = analysis
+    match.value = found
   } catch (e) {
     error.value = e.message || '对局不存在或该玩家不在此对局'
   } finally {

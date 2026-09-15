@@ -70,7 +70,6 @@ function formatTime(iso) {
 const rows = computed(() =>
   matches.value.map((match) => {
     const me = findMe(match)
-    const rounds = (match.blue_score ?? 0) + (match.red_score ?? 0)
     let result = { text: '—', cls: 'draw' }
     if (me) {
       const myScore = me.team === 'blue' ? match.blue_score : match.red_score
@@ -84,7 +83,7 @@ const rows = computed(() =>
       time: formatTime(match.started_at),
       agent: me?.agent || '—',
       kda: me ? `${me.kills} / ${me.deaths} / ${me.assists}` : '—',
-      acs: me && rounds > 0 ? Math.round(me.score / rounds) : '—',
+      acs: me ? me.score : '—',
       result,
     }
   })

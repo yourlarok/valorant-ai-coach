@@ -1,7 +1,10 @@
 const BASE = '/api'
 
-export async function listMatches(name) {
-  const r = await fetch(`${BASE}/matches?name=${encodeURIComponent(name)}`)
+export async function listMatches(name, count) {
+  let url = `${BASE}/matches?name=${encodeURIComponent(name)}`
+  if (count) url += `&count=${count}`
+  const r = await fetch(url)
+  if (!r.ok) throw new Error((await r.json()).detail || '获取对局列表失败')
   return r.json()
 }
 export async function getAnalysis(matchId, name) {
