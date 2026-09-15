@@ -1,0 +1,514 @@
+{
+  "match_id": "fixture-match-005",
+  "mode": "竞技模式",
+  "map": "隐世修所",
+  "started_at": "2026-09-10T20:30:00+08:00",
+  "blue_score": 5,
+  "red_score": 13,
+  "players": [
+    {
+      "puuid": "puuid-me-0001",
+      "name": "测试玩家#1234",
+      "agent": "捷风",
+      "team": "blue",
+      "kills": 7,
+      "deaths": 15,
+      "assists": 2,
+      "score": 98,
+      "headshots": 1,
+      "bodyshots": 5,
+      "legshots": 1,
+      "damage_made": 1440,
+      "first_bloods": 1,
+      "first_deaths": 6,
+      "econ_spent": 27000,
+      "ability_casts": {
+        "cloudburst": 8,
+        "updraft": 5,
+        "tailwind": 4,
+        "blade_storm": 0
+      },
+      "weapon_kills": {
+        "vandal": 4,
+        "spectre": 2,
+        "classic": 1
+      },
+      "ability_damage": 60,
+      "ability_assists": 0,
+      "survival_rounds": 1,
+      "clutch_wins": 0,
+      "clutch_attempts": 1,
+      "party_id": "party-alpha"
+    },
+    {
+      "puuid": "puuid-b2-0002",
+      "name": "蓝队队友一#2001",
+      "agent": "斯凯",
+      "team": "blue",
+      "kills": 9,
+      "deaths": 14,
+      "assists": 5,
+      "score": 132,
+      "headshots": 2,
+      "bodyshots": 6,
+      "legshots": 1,
+      "damage_made": 1350,
+      "first_bloods": 1,
+      "first_deaths": 2,
+      "econ_spent": 25600,
+      "ability_casts": {
+        "trailblazer": 8,
+        "guiding_light": 10,
+        "regrowth": 4,
+        "seekers": 1
+      },
+      "weapon_kills": {
+        "phantom": 6,
+        "spectre": 2,
+        "classic": 1
+      },
+      "ability_damage": 80,
+      "ability_assists": 4,
+      "survival_rounds": 2,
+      "clutch_wins": 0,
+      "clutch_attempts": 1,
+      "party_id": "party-alpha"
+    },
+    {
+      "puuid": "puuid-b3-0003",
+      "name": "蓝队队友二#3001",
+      "agent": "幽影",
+      "team": "blue",
+      "kills": 8,
+      "deaths": 15,
+      "assists": 4,
+      "score": 124,
+      "headshots": 2,
+      "bodyshots": 5,
+      "legshots": 1,
+      "damage_made": 1200,
+      "first_bloods": 1,
+      "first_deaths": 2,
+      "econ_spent": 24900,
+      "ability_casts": {
+        "dark_cover": 9,
+        "shrouded_step": 4,
+        "paranoia": 3,
+        "from_the_shadows": 1
+      },
+      "weapon_kills": {
+        "vandal": 5,
+        "spectre": 2,
+        "classic": 1
+      },
+      "ability_damage": 110,
+      "ability_assists": 2,
+      "survival_rounds": 2,
+      "clutch_wins": 0,
+      "clutch_attempts": 1,
+      "party_id": null
+    },
+    {
+      "puuid": "puuid-b4-0004",
+      "name": "蓝队队友三#4001",
+      "agent": "奇乐",
+      "team": "blue",
+      "kills": 10,
+      "deaths": 13,
+      "assists": 3,
+      "score": 145,
+      "headshots": 3,
+      "bodyshots": 6,
+      "legshots": 1,
+      "damage_made": 1500,
+      "first_bloods": 2,
+      "first_deaths": 1,
+      "econ_spent": 26800,
+      "ability_casts": {
+        "nanoswarm": 7,
+        "alarmbot": 8,
+        "turret": 9,
+        "lockdown": 1
+      },
+      "weapon_kills": {
+        "vandal": 7,
+        "sheriff": 2,
+        "ghost": 1
+      },
+      "ability_damage": 190,
+      "ability_assists": 1,
+      "survival_rounds": 3,
+      "clutch_wins": 1,
+      "clutch_attempts": 1,
+      "party_id": null
+    },
+    {
+      "puuid": "puuid-b5-0005",
+      "name": "蓝队队友四#5001",
+      "agent": "铁臂",
+      "team": "blue",
+      "kills": 6,
+      "deaths": 16,
+      "assists": 6,
+      "score": 96,
+      "headshots": 1,
+      "bodyshots": 4,
+      "legshots": 1,
+      "damage_made": 980,
+      "first_bloods": 0,
+      "first_deaths": 2,
+      "econ_spent": 23400,
+      "ability_casts": {
+        "aftershock": 7,
+        "flashpoint": 8,
+        "fault_line": 5,
+        "rolling_thunder": 1
+      },
+      "weapon_kills": {
+        "phantom": 4,
+        "spectre": 1,
+        "classic": 1
+      },
+      "ability_damage": 210,
+      "ability_assists": 5,
+      "survival_rounds": 1,
+      "clutch_wins": 0,
+      "clutch_attempts": 1,
+      "party_id": null
+    },
+    {
+      "puuid": "puuid-r1-0006",
+      "name": "红队对手一#6001",
+      "agent": "雷兹",
+      "team": "red",
+      "kills": 18,
+      "deaths": 8,
+      "assists": 4,
+      "score": 262,
+      "headshots": 6,
+      "bodyshots": 10,
+      "legshots": 2,
+      "damage_made": 2600,
+      "first_bloods": 4,
+      "first_deaths": 1,
+      "econ_spent": 32600,
+      "ability_casts": {
+        "boom_bot": 7,
+        "blast_pack": 8,
+        "paint_shells": 7,
+        "showstopper": 2
+      },
+      "weapon_kills": {
+        "vandal": 12,
+        "operator": 4,
+        "sheriff": 2
+      },
+      "ability_damage": 300,
+      "ability_assists": 2,
+      "survival_rounds": 4,
+      "clutch_wins": 1,
+      "clutch_attempts": 2,
+      "party_id": "party-beta"
+    },
+    {
+      "puuid": "puuid-r2-0007",
+      "name": "红队对手二#7001",
+      "agent": "圣祈",
+      "team": "red",
+      "kills": 11,
+      "deaths": 7,
+      "assists": 7,
+      "score": 158,
+      "headshots": 2,
+      "bodyshots": 8,
+      "legshots": 1,
+      "damage_made": 1550,
+      "first_bloods": 1,
+      "first_deaths": 1,
+      "econ_spent": 27900,
+      "ability_casts": {
+        "barrier_orb": 8,
+        "slow_orb": 6,
+        "healing_orb": 10,
+        "resurrection": 1
+      },
+      "weapon_kills": {
+        "phantom": 7,
+        "ghost": 2,
+        "classic": 2
+      },
+      "ability_damage": 50,
+      "ability_assists": 5,
+      "survival_rounds": 4,
+      "clutch_wins": 0,
+      "clutch_attempts": 0,
+      "party_id": "party-beta"
+    },
+    {
+      "puuid": "puuid-r3-0008",
+      "name": "红队对手三#8001",
+      "agent": "苏法",
+      "team": "red",
+      "kills": 14,
+      "deaths": 8,
+      "assists": 8,
+      "score": 205,
+      "headshots": 4,
+      "bodyshots": 9,
+      "legshots": 1,
+      "damage_made": 2050,
+      "first_bloods": 3,
+      "first_deaths": 1,
+      "econ_spent": 30400,
+      "ability_casts": {
+        "owl_drone": 9,
+        "shock_bolt": 8,
+        "recon_bolt": 7,
+        "hunters_fury": 1
+      },
+      "weapon_kills": {
+        "vandal": 10,
+        "operator": 2,
+        "sheriff": 2
+      },
+      "ability_damage": 180,
+      "ability_assists": 3,
+      "survival_rounds": 4,
+      "clutch_wins": 1,
+      "clutch_attempts": 1,
+      "party_id": null
+    },
+    {
+      "puuid": "puuid-r4-0009",
+      "name": "红队对手四#9001",
+      "agent": "菲尼克斯",
+      "team": "red",
+      "kills": 16,
+      "deaths": 9,
+      "assists": 3,
+      "score": 232,
+      "headshots": 5,
+      "bodyshots": 10,
+      "legshots": 1,
+      "damage_made": 2350,
+      "first_bloods": 3,
+      "first_deaths": 1,
+      "econ_spent": 31200,
+      "ability_casts": {
+        "blaze": 7,
+        "curveball": 9,
+        "hot_hands": 6,
+        "run_it_back": 1
+      },
+      "weapon_kills": {
+        "phantom": 11,
+        "vandal": 3,
+        "ghost": 2
+      },
+      "ability_damage": 230,
+      "ability_assists": 2,
+      "survival_rounds": 3,
+      "clutch_wins": 1,
+      "clutch_attempts": 1,
+      "party_id": null
+    },
+    {
+      "puuid": "puuid-r5-0010",
+      "name": "红队对手五#0002",
+      "agent": "薇蝮",
+      "team": "red",
+      "kills": 14,
+      "deaths": 8,
+      "assists": 5,
+      "score": 212,
+      "headshots": 3,
+      "bodyshots": 10,
+      "legshots": 1,
+      "damage_made": 2000,
+      "first_bloods": 2,
+      "first_deaths": 1,
+      "econ_spent": 29800,
+      "ability_casts": {
+        "snake_bite": 6,
+        "poison_cloud": 8,
+        "toxic_screen": 5,
+        "vipers_pit": 1
+      },
+      "weapon_kills": {
+        "vandal": 10,
+        "spectre": 3,
+        "sheriff": 1
+      },
+      "ability_damage": 240,
+      "ability_assists": 5,
+      "survival_rounds": 3,
+      "clutch_wins": 0,
+      "clutch_attempts": 1,
+      "party_id": null
+    }
+  ],
+  "rounds": [
+    {
+      "round_num": 1,
+      "winning_team": "red",
+      "end_type": "elimination",
+      "player_kills": 0,
+      "player_first_blood": false,
+      "player_first_death": true,
+      "pistol": true
+    },
+    {
+      "round_num": 2,
+      "winning_team": "blue",
+      "end_type": "elimination",
+      "player_kills": 2,
+      "player_first_blood": false,
+      "player_first_death": false,
+      "pistol": false
+    },
+    {
+      "round_num": 3,
+      "winning_team": "red",
+      "end_type": "detonate",
+      "player_kills": 0,
+      "player_first_blood": false,
+      "player_first_death": false,
+      "pistol": false
+    },
+    {
+      "round_num": 4,
+      "winning_team": "red",
+      "end_type": "elimination",
+      "player_kills": 0,
+      "player_first_blood": false,
+      "player_first_death": true,
+      "pistol": false
+    },
+    {
+      "round_num": 5,
+      "winning_team": "red",
+      "end_type": "elimination",
+      "player_kills": 0,
+      "player_first_blood": false,
+      "player_first_death": false,
+      "pistol": false
+    },
+    {
+      "round_num": 6,
+      "winning_team": "blue",
+      "end_type": "elimination",
+      "player_kills": 1,
+      "player_first_blood": false,
+      "player_first_death": false,
+      "pistol": false
+    },
+    {
+      "round_num": 7,
+      "winning_team": "red",
+      "end_type": "defuse",
+      "player_kills": 0,
+      "player_first_blood": false,
+      "player_first_death": false,
+      "pistol": false
+    },
+    {
+      "round_num": 8,
+      "winning_team": "red",
+      "end_type": "detonate",
+      "player_kills": 0,
+      "player_first_blood": false,
+      "player_first_death": true,
+      "pistol": false
+    },
+    {
+      "round_num": 9,
+      "winning_team": "red",
+      "end_type": "elimination",
+      "player_kills": 0,
+      "player_first_blood": false,
+      "player_first_death": false,
+      "pistol": false
+    },
+    {
+      "round_num": 10,
+      "winning_team": "blue",
+      "end_type": "elimination",
+      "player_kills": 2,
+      "player_first_blood": true,
+      "player_first_death": false,
+      "pistol": false
+    },
+    {
+      "round_num": 11,
+      "winning_team": "red",
+      "end_type": "time",
+      "player_kills": 0,
+      "player_first_blood": false,
+      "player_first_death": false,
+      "pistol": false
+    },
+    {
+      "round_num": 12,
+      "winning_team": "red",
+      "end_type": "elimination",
+      "player_kills": 0,
+      "player_first_blood": false,
+      "player_first_death": false,
+      "pistol": false
+    },
+    {
+      "round_num": 13,
+      "winning_team": "red",
+      "end_type": "detonate",
+      "player_kills": 0,
+      "player_first_blood": false,
+      "player_first_death": true,
+      "pistol": true
+    },
+    {
+      "round_num": 14,
+      "winning_team": "blue",
+      "end_type": "defuse",
+      "player_kills": 1,
+      "player_first_blood": false,
+      "player_first_death": false,
+      "pistol": false
+    },
+    {
+      "round_num": 15,
+      "winning_team": "red",
+      "end_type": "elimination",
+      "player_kills": 0,
+      "player_first_blood": false,
+      "player_first_death": true,
+      "pistol": false
+    },
+    {
+      "round_num": 16,
+      "winning_team": "blue",
+      "end_type": "elimination",
+      "player_kills": 1,
+      "player_first_blood": false,
+      "player_first_death": false,
+      "pistol": false
+    },
+    {
+      "round_num": 17,
+      "winning_team": "red",
+      "end_type": "elimination",
+      "player_kills": 0,
+      "player_first_blood": false,
+      "player_first_death": false,
+      "pistol": false
+    },
+    {
+      "round_num": 18,
+      "winning_team": "red",
+      "end_type": "detonate",
+      "player_kills": 0,
+      "player_first_blood": false,
+      "player_first_death": true,
+      "pistol": false
+    }
+  ]
+}

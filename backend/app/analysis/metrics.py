@@ -25,6 +25,14 @@ class AbilityScores(BaseModel):
     grade: str
 
 
+class ExtendedStats(BaseModel):
+    adr: float  # 场均回合伤害 = damage_made 总和 / 总回合
+    kast: float  # 击杀/助攻/存活回合占比
+    fb_participation: float  # 首杀参与率 = first_bloods / 总回合
+    pistol_wr: float  # 手枪局胜率
+    clutch_wr: float | None = None  # 残局胜率，无残局场次时为 None
+
+
 def _player_stats(matches: list[Match], player_name: str):
     stats = []
     for m in matches:
@@ -70,6 +78,46 @@ def compute_raws(matches: list[Match], player_name: str) -> DimensionRaws:
         economy_spend_per_round=econ,
         utility_casts_per_round=casts_per_round,
         consistency_acs_cv=cv,
+    )
+
+
+def extended_stats(matches: list[Match], player_name: str) -> ExtendedStats:
+    stats = _player_stats(matches, player_name)
+
+    def _match_rounds(m: Match) -> int:
+        return len(m.rounds) if m.rounds else m.blue_score + m.red_score
+
+    total_rounds = sum(_match_rounds(m) for m, _ in stats)
+    damage = sum(p.damage_made for _, p in stats)
+    fb = sum(p.first_bloods for _, p in stats)
+
+    kast_rounds = 0
+    pistol_played = 0
+    pistol_won = 0
+    for m, p in stats:
+        m_rounds = _match_rounds(m)
+        if m.rounds:
+            kill_rounds = sum(1 for r in m.rounds if r.player_kills > 0)
+            for r in m.rounds:
+                if r.pistol:
+                    pistol_played += 1
+                    if r.winning_team == p.team:
+                        pistol_won += 1
+        else:
+            # 无回合级数据时按总击杀估算击杀回合数
+            kill_rounds = min(p.kills, m_rounds)
+        kill_or_survive = min(kill_rounds + p.survival_rounds, m_rounds)
+        kast_rounds += kill_or_survive + min(p.assists, m_rounds - kill_or_survive)
+
+    clutch_wins = sum(p.clutch_wins for _, p in stats)
+    clutch_attempts = sum(p.clutch_attempts for _, p in stats)
+
+    return ExtendedStats(
+        adr=damage / total_rounds if total_rounds else 0.0,
+        kast=kast_rounds / total_rounds if total_rounds else 0.0,
+        fb_participation=fb / total_rounds if total_rounds else 0.0,
+        pistol_wr=pistol_won / pistol_played if pistol_played else 0.0,
+        clutch_wr=clutch_wins / clutch_attempts if clutch_attempts else None,
     )
 
 
